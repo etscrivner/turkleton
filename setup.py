@@ -24,7 +24,7 @@ test_requirements = [
 
 setup(
     name='turkleton',
-    version='0.1.0',
+    version='0.1.1',
     description="Simplified interfaces for assignments on Mechanical Turk.",
     long_description=readme + '\n\n' + history,
     author="Eric Scrivner",
@@ -32,9 +32,11 @@ setup(
     url='https://github.com/etscrivner/turkleton',
     packages=[
         'turkleton',
+        'turkleton.assignment'
     ],
-    package_dir={'turkleton':
-                 'turkleton'},
+    package_dir={
+        'turkleton': 'turkleton'
+    },
     include_package_data=True,
     install_requires=requirements,
     license="BSD",
@@ -46,7 +48,6 @@ setup(
         'License :: OSI Approved :: BSD License',
         'Natural Language :: English',
         "Programming Language :: Python :: 2",
-        'Programming Language :: Python :: 2.6',
         'Programming Language :: Python :: 2.7',
         'Programming Language :: Python :: 3',
         'Programming Language :: Python :: 3.3',
