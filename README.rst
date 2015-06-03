@@ -5,13 +5,12 @@ turkleton
 .. image:: https://img.shields.io/travis/etscrivner/turkleton.svg
         :target: https://travis-ci.org/etscrivner/turkleton
 
-.. image:: https://coveralls.io/repos/etscrivner/turkleton/badge.svg
-  :target: https://coveralls.io/r/etscrivner/turkleton
-
-
 .. image:: https://coveralls.io/repos/etscrivner/turkleton/badge.svg?branch=master
   :target: https://coveralls.io/r/etscrivner/turkleton?branch=master
 
+
+.. image:: https://img.shields.io/pypi/v/turkleton.svg
+        :target: https://pypi.python.org/pypi/turkleton
 
 Dead simple Python interfaces for Amazon Mechanical Turk.
 
