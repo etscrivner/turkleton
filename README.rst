@@ -48,7 +48,7 @@ Turk:
    from turkleton import connection
 
    conn = connection.make_connection(AWS_ACCESS_KEY, AWS_SECRET_ACCESS_KEY)
-   task = MyTask({'param1': 'val1', 'param2': 'val2'})
+   task = MyTask({'image_url': 'http://test.com/img.png', 'first_guess': '29'})
    hit = task.upload(conn, batch_id='1234')
 
 This will create a new task and upload it to Mechanical Turk. The optional
