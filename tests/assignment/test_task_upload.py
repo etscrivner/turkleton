@@ -5,16 +5,7 @@ from boto.mturk import price
 import mock
 
 from turkleton.assignment import task
-
-
-class CategorizationTask(task.BaseTask):
-    """Represents a simple, testable task"""
-
-    __layout_id__ = '3MCDHXBQ4Z7SJ2ZT2XZACNE142JWKX'
-    __reward__ = 0.02
-    __title__ = 'Categorize An Image'
-    __description__ = 'Categorize this rad image.'
-    __keywords__ = ['image', 'categorize']
+from tests.assignment import factories
 
 
 class TestTaskUpload(unittest.TestCase):
@@ -24,7 +15,7 @@ class TestTaskUpload(unittest.TestCase):
         self.params = {
             'image_url': 'http://herp.com/derp'
         }
-        self.categorization_task = CategorizationTask(**self.params)
+        self.categorization_task = factories.make_task(self.params)
         self.mock_connection = mock.Mock()
         self.expected_reward = price.Price(
             self.categorization_task.__reward__,
