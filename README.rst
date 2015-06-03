@@ -11,7 +11,7 @@ turkleton
 .. image:: https://img.shields.io/pypi/v/turkleton.svg
         :target: https://pypi.python.org/pypi/turkleton
 
-Simplified interfaces for assignments on Mechanical Turk.
+Dead simple Python interfaces for Amazon Mechanical Turk.
 
 * Free software: BSD license
 * Documentation: https://turkleton.readthedocs.org.
