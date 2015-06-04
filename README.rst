@@ -26,7 +26,17 @@ Features
 Examples
 --------
 
-Here's how you would define a task template to be uploaded:
+In turkleton there are several objects to be aware of: Tasks, HITs, and
+Assignments. A Task is a template from which HITs are created. A HIT
+corresponds to HIT in the Amazon Mechanical Turk API and represents an uploaded
+Task. Assignments are contained within HITs and represents the set of answers
+submitted by a single worker. A HIT can have many Assignments.
+
+Creating And Uploading HITs
+^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+To define a HIT you create a Task representing the template of the assignment
+you want a worker to complete. For example:
 
 .. code-block:: python
 
@@ -43,8 +53,8 @@ Here's how you would define a task template to be uploaded:
        __time_per_assignment__ = datetime.timedelta(minutes=5)
 
 
-Now that we've defined our assignment we can easily upload it to Mechanical
-Turk:
+Here we've created a Task from an existing layout. Now that we've defined our
+task we can easily upload HITs using it to Mechanical Turk:
 
 .. code-block:: python
 
@@ -54,6 +64,44 @@ Turk:
    task = MyTask({'image_url': 'http://test.com/img.png', 'first_guess': '29'})
    hit = task.upload(conn, batch_id='1234')
 
-This will create a new task and upload it to Mechanical Turk. The optional
-batch_id parameter allows you to set the annotation for the task to an
-arbitrary string that you can use to retrieve tasks later in batches.
+This will create a new assignment from the task template and upload it to
+Mechanical Turk. The optional batch_id parameter allows you to set the
+annotation for the task to an arbitrary string that you can use to retrieve
+tasks later in batches.
+
+Downloading HIT Results
+^^^^^^^^^^^^^^^^^^^^^^^
+
+To download results for a HIT you first need to define an assignment. The
+assignment defines what values are expected and their types. These are used to
+automatically parse answers to the various questions:
+
+.. code-block:: python
+
+    from turkleton.assignment import assignment
+    from turkleton.assignment import answers
+    
+    class MyAssignment(assignment.BaseAssignment):
+        categories = answers.MultiChoiceAnswer(question_name='Categories')
+        notes = answers.TextAnswer(question_name='AdditionalNotes')
+        does_not_match_any = answers.BooleanAnswer(question_name='DoesNotMatchAnyCategories')
+
+You can then download all of the HITs in a given batch as follows:
+
+.. code-block:: python
+
+    from turkleton.assignment import hit
+    reviewable_hits = hit.get_reviewable_in_batch(mturk_connection, '1234')
+
+Each HIT may then have multiple assignments associated with it. You can
+download the assignments, review them, and then dispost of the HIT as follows:
+
+.. code-block:: python
+
+    for each in MyAssignment.get_by_hit_id(mturk_connection, hit.hit_id):
+        print('{} - {} - {}'.format(each.categories, each.notes, each.does_not_matchy_any))
+        if each.is_valid():
+            each.accept('Good job!')
+        else:
+            each.reject('Assignment does not follow instructions.')
+    hit.dispose()
