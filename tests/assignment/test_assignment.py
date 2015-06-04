@@ -27,13 +27,16 @@ class TestGetQuestionNameToAnswerAttributeTable(unittest.TestCase):
         result = assignment.get_question_name_to_answer_attribute_table(
             FakeAssignment
         )
-        self.assertEqual(['Age', 'IsOld', 'Categories'], result.keys())
+        self.assertEqual(set(['Age', 'IsOld', 'Categories']), set(result))
 
     def test_should_have_correct_attribute_names(self):
         result = assignment.get_question_name_to_answer_attribute_table(
             FakeAssignment
         )
-        self.assertEqual(['age', 'is_old', 'categories'], result.values())
+        self.assertEqual(
+            set(['age', 'is_old', 'categories']),
+            set(result.values())
+        )
 
 
 class TestGetAnswerToQuestion(unittest.TestCase):
@@ -80,18 +83,36 @@ class TestBaseAssignment(unittest.TestCase):
         self.boto_assignment_fixture = factories.make_boto_assignment(
             self.assignment_fixture
         )
+        self.fake_assignment = FakeAssignment(self.boto_assignment_fixture)
 
     def test_should_correctly_initialize_age(self):
-        fake_assignment = FakeAssignment(self.boto_assignment_fixture)
-        self.assertEqual(self.assignment_fixture['Age'], fake_assignment.age)
+        self.assertEqual(
+            self.assignment_fixture['Age'], self.fake_assignment.age
+        )
 
     def test_should_correctly_initialize_is_old(self):
-        fake_assignment = FakeAssignment(self.boto_assignment_fixture)
-        self.assertFalse(fake_assignment.is_old)
+        self.assertFalse(self.fake_assignment.is_old)
 
     def test_should_have_correct_categories(self):
-        fake_assignment = FakeAssignment(self.boto_assignment_fixture)
         self.assertEqual(
             self.assignment_fixture['Categories'].split('|'),
-            fake_assignment.categories
+            self.fake_assignment.categories
+        )
+
+    def test_should_have_correct_assignment_id(self):
+        self.assertEqual(
+            self.boto_assignment_fixture.AssignmentId,
+            self.fake_assignment.assignment_id
+        )
+
+    def test_should_have_correct_hit_id(self):
+        self.assertEqual(
+            self.boto_assignment_fixture.HITId,
+            self.fake_assignment.hit_id
+        )
+
+    def test_should_have_correct_worker_id(self):
+        self.assertEqual(
+            self.boto_assignment_fixture.WorkerId,
+            self.fake_assignment.worker_id
         )

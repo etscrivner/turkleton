@@ -63,3 +63,27 @@ class BaseAssignment(object):
         for question_name, attr_name in self.question_to_attr.items():
             answer = get_answer_to_question(self.assignment, question_name)
             setattr(self, attr_name, answer)
+
+    @property
+    def assignment_id(self):
+        """Return the ID associated with this assignment.
+
+        :rtype: str or unicode
+        """
+        return self.assignment.AssignmentId
+
+    @property
+    def hit_id(self):
+        """Return the ID associated with this HIT.
+
+        :rtype: str or unicode
+        """
+        return self.assignment.HITId
+
+    @property
+    def worker_id(self):
+        """Return the ID of the worker who completed this assignment.
+
+        :rtype: str or unicode
+        """
+        return self.assignment.WorkerId

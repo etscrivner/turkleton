@@ -5,6 +5,8 @@
     Factories for producing assignment related object.
 
 """
+import uuid
+
 import mock
 
 from turkleton.assignment import task
@@ -44,10 +46,15 @@ def make_boto_assignment(values):
     :type values: dict
     """
     assignment = mock.MagicMock()
+    assignment.AssignmentId = str(uuid.uuid4())
+    assignment.HITId = str(uuid.uuid4())
+    assignment.WorkerId = str(uuid.uuid4())
+
     assignment.answers = [[]]
     for key, value in values.items():
         answer_mock = mock.MagicMock()
         answer_mock.qid = key
         answer_mock.fields = [value]
         assignment.answers[0].append(answer_mock)
+
     return assignment
