@@ -11,3 +11,8 @@
 class Error(Exception):
     """Base class for all errors"""
     pass
+
+
+class ConnectionError(Error):
+    """Error involving a connection to a service"""
+    pass

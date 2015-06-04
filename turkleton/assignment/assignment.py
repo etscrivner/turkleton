@@ -5,6 +5,7 @@
     Representations for the results from uploaded HITs.
 
 """
+from turkleton import errors
 from turkleton.assignment import answer
 
 
@@ -91,3 +92,23 @@ class BaseAssignment(object):
         :rtype: str or unicode
         """
         return self.assignment.WorkerId
+
+    def approve(self, message):
+        """Approve this assignment with the given message.
+
+        :param message: A message to send to the turker
+        :type message: str or unicode
+        """
+        if not self.boto_connection:
+            raise errors.ConnectionError('Assignment has no boto connection.')
+        self.boto_connection.approve_assignment(self.assignment_id, message)
+
+    def reject(self, message):
+        """Reject this assignment with the given message.
+
+        :param message: A message to send to the turker
+        :type message: str or unicode
+        """
+        if not self.boto_connection:
+            raise errors.ConnectionError('Assignment has no boto connection.')
+        self.boto_connection.reject_assignment(self.assignment_id, message)

@@ -1,9 +1,12 @@
 # -*- coding: utf-8 -*-
 import unittest
 
+import mock
+
+from tests.assignment import factories
+from turkleton import errors
 from turkleton.assignment import answer
 from turkleton.assignment import assignment
-from tests.assignment import factories
 
 
 class FakeAssignment(assignment.BaseAssignment):
@@ -11,6 +14,26 @@ class FakeAssignment(assignment.BaseAssignment):
     age = answer.TextAnswer('Age', None)
     categories = answer.MultiChoiceAnswer('Categories')
     is_old = answer.BooleanAnswer('IsOld', True)
+
+
+class BaseAssignmentTestCase(unittest.TestCase):
+
+    def setUp(self):
+        super(BaseAssignmentTestCase, self).setUp()
+        self.assignment_fixture = {
+            'Age': '29',
+            'IsOld': '0',
+            'Categories': 'Front|WaistUp'
+        }
+        self.boto_assignment_fixture = factories.make_boto_assignment(
+            self.assignment_fixture
+        )
+        self.fake_assignment = FakeAssignment(self.boto_assignment_fixture)
+
+    def test_should_correctly_initialize_age(self):
+        self.assertEqual(
+            self.assignment_fixture['Age'], self.fake_assignment.age
+        )
 
 
 class TestGetQuestionNameToAnswerAttributeTable(unittest.TestCase):
@@ -71,24 +94,7 @@ class TestGetAnswerToQuestion(unittest.TestCase):
         self.assertEqual(self.assignment_fixture['Age'], result)
 
 
-class TestBaseAssignment(unittest.TestCase):
-
-    def setUp(self):
-        super(TestBaseAssignment, self).setUp()
-        self.assignment_fixture = {
-            'Age': '29',
-            'IsOld': '0',
-            'Categories': 'Front|WaistUp'
-        }
-        self.boto_assignment_fixture = factories.make_boto_assignment(
-            self.assignment_fixture
-        )
-        self.fake_assignment = FakeAssignment(self.boto_assignment_fixture)
-
-    def test_should_correctly_initialize_age(self):
-        self.assertEqual(
-            self.assignment_fixture['Age'], self.fake_assignment.age
-        )
+class TestBaseAssignment(BaseAssignmentTestCase):
 
     def test_should_correctly_initialize_is_old(self):
         self.assertFalse(self.fake_assignment.is_old)
@@ -115,4 +121,38 @@ class TestBaseAssignment(unittest.TestCase):
         self.assertEqual(
             self.boto_assignment_fixture.WorkerId,
             self.fake_assignment.worker_id
+        )
+
+
+class TestApprove(BaseAssignmentTestCase):
+
+    def test_should_raise_error_if_no_boto_connection_given(self):
+        with self.assertRaisesRegexp(errors.ConnectionError,
+                                     'Assignment has no boto connection.'):
+            self.fake_assignment.approve('Good job!')
+
+    def test_should_pass_correct_information_to_boto_connection(self):
+        mock_connection = mock.MagicMock()
+        self.fake_assignment.boto_connection = mock_connection
+        self.fake_assignment.approve('Good job!')
+        mock_connection.approve_assignment.assert_called_once_with(
+            self.fake_assignment.assignment_id,
+            'Good job!'
+        )
+
+
+class TestReject(BaseAssignmentTestCase):
+
+    def test_should_raise_error_if_no_boto_connection_given(self):
+        with self.assertRaisesRegexp(errors.ConnectionError,
+                                     'Assignment has no boto connection.'):
+            self.fake_assignment.reject('Bad job!')
+
+    def test_should_pass_correct_arguments_to_connection(self):
+        mock_connection = mock.MagicMock()
+        self.fake_assignment.boto_connection = mock_connection
+        self.fake_assignment.reject('Bad job!')
+        mock_connection.reject_assignment.assert_called_once_with(
+            self.fake_assignment.assignment_id,
+            'Bad job!'
         )

@@ -99,7 +99,7 @@ download the assignments, review them, and then dispost of the HIT as follows:
 .. code-block:: python
 
     for each in MyAssignment.get_by_hit_id(mturk_connection, hit.hit_id):
-        print('{} - {} - {}'.format(each.categories, each.notes, each.does_not_matchy_any))
+        print('{} - {} - {}'.format(each.categories, each.notes, each.does_not_match_any))
         if each.is_valid():
             each.accept('Good job!')
         else:
