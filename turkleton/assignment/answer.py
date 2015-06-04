@@ -5,6 +5,7 @@
     Representations for various answer types from uploaded HITs.
 
 """
+import six
 
 
 class BaseAnswer(object):
@@ -75,7 +76,7 @@ class BooleanAnswer(BaseAnswer):
         convert it into a boolean.
         """
         self.value = val
-        if isinstance(val, basestring):
+        if isinstance(val, six.string_types):
             self.value = self.string_to_bool.get(val, self._EMPTY)
 
 
