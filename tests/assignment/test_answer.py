@@ -27,14 +27,79 @@ class TestBaseAnswer(unittest.TestCase):
     def test_should_initially_contain_empty_value(self):
         self.assertTrue(self.base_answer.value is answer.BaseAnswer._EMPTY)
 
-    def test_should_raise_error_when_attempt_made_to_get_value(self):
+    def test_should_return_default_value_if_empty(self):
         inst = self.DescriptorTestClass()
-        with self.assertRaisesRegexp(NotImplementedError,
-                                     "Attempt to read value of BaseAnswer."):
-            inst.prop
+        self.assertEqual(self.base_answer.default, inst.prop)
 
-    def test_should_raise_error_when_attempt_made_to_set_value(self):
+    def test_should_return_value_if_value_is_not_empty(self):
         inst = self.DescriptorTestClass()
-        with self.assertRaisesRegexp(NotImplementedError,
-                                     "Attempt to write value of BaseAnswer."):
-            inst.prop = 123
+        inst.prop = 123
+        self.assertEqual(123, inst.prop)
+
+
+class TestBooleanAnswer(unittest.TestCase):
+
+    class DescriptorTestClass(object):
+        """Class for testing descriptor properties of answer"""
+        prop = answer.BooleanAnswer('Herp', False)
+
+    class AlternateMappingDescriptorTestClass(object):
+        """Class for testing descriptor with alternative str-bool mapping"""
+        prop = answer.BooleanAnswer('Herp', False, {'T': True, 'F': False})
+
+    def setUp(self):
+        super(TestBooleanAnswer, self).setUp()
+        self.descriptor_class = self.DescriptorTestClass()
+
+    def test_should_be_able_to_set_to_true_from_string(self):
+        self.descriptor_class.prop = '1'
+        self.assertTrue(self.descriptor_class.prop)
+
+    def test_should_be_able_to_set_to_false_from_string(self):
+        self.descriptor_class.prop = '0'
+        self.assertFalse(self.descriptor_class.prop)
+
+    def test_should_be_able_to_set_to_boolean_true(self):
+        self.descriptor_class.prop = True
+        self.assertTrue(self.descriptor_class.prop)
+
+    def test_should_be_able_to_set_to_boolean_false(self):
+        self.descriptor_class.prop = False
+        self.assertFalse(self.descriptor_class.prop)
+
+    def test_should_leave_empty_if_none_given(self):
+        self.descriptor_class.prop = None
+        self.assertFalse(self.descriptor_class.prop)
+
+    def test_should_be_able_to_redefine_true_values(self):
+        alternate_class = self.AlternateMappingDescriptorTestClass()
+        alternate_class.prop = 'T'
+        self.assertTrue(alternate_class.prop)
+
+    def test_should_be_able_to_redefine_false_values(self):
+        alternate_class = self.AlternateMappingDescriptorTestClass()
+        alternate_class.prop = 'F'
+        self.assertFalse(alternate_class.prop)
+
+
+class TestMultiChoiceAnswer(unittest.TestCase):
+
+    class DescriptorTestClass(object):
+        """Test the answer as a descriptor"""
+        prop = answer.MultiChoiceAnswer('Herp')
+
+    def setUp(self):
+        super(TestMultiChoiceAnswer, self).setUp()
+        self.descriptor_class = self.DescriptorTestClass()
+
+    def test_should_correctly_handle_empty_string(self):
+        self.descriptor_class.prop = ''
+        self.assertEqual([], self.descriptor_class.prop)
+
+    def test_should_correctly_handle_single_selected_choice(self):
+        self.descriptor_class.prop = 'Face'
+        self.assertEqual(['Face'], self.descriptor_class.prop)
+
+    def test_should_correctly_handle_multi_items(self):
+        self.descriptor_class.prop = 'Face|Neck|Hands'
+        self.assertEqual(['Face', 'Neck', 'Hands'], self.descriptor_class.prop)
