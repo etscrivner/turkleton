@@ -4,8 +4,9 @@
     ~~~~~~~~~~~~~~~~~~~~~~~~~~
     Factories for producing assignment related object.
 
-
 """
+import mock
+
 from turkleton.assignment import task
 
 
@@ -33,3 +34,20 @@ def make_task(layout_parameters=None):
         }
 
     return CategorizationTaskFixture(**layout_parameters)
+
+
+def make_boto_assignment(values):
+    """Creates a new boto assignment mock class with the given fields
+    supplied with the specified values.
+
+    :param values: A dictionary mapping question names to values
+    :type values: dict
+    """
+    assignment = mock.MagicMock()
+    assignment.answers = [[]]
+    for key, value in values.items():
+        answer_mock = mock.MagicMock()
+        answer_mock.qid = key
+        answer_mock.fields = [value]
+        assignment.answers[0].append(answer_mock)
+    return assignment
