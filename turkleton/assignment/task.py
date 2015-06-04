@@ -51,25 +51,25 @@ class BaseTask(object):
         """Represents an error while validating task"""
         pass
 
-    # The HIT layout ID from Mechanical Turk (changes each time HIT is saved)
+    #: The HIT layout ID from Mechanical Turk (changes each time HIT is saved)
     __layout_id__ = None
-    # The reward for each completed assignment (eg. 0.25)
+    #: The reward for each completed assignment (eg. 0.25)
     __reward__ = None
-    # The title of the assignment shown to turks
+    #: The title of the assignment shown to turks
     __title__ = None
-    # The description of the assignment shown to turkers
+    #: The description of the assignment shown to turkers
     __description__ = None
-    # A list of keywords for this assignment (eg. ['parking', 'rates'])
+    #: A list of keywords for this assignment (eg. ['parking', 'rates'])
     __keywords__ = None
-    # The redundancy for each uploaded assignment (default is 1)
+    #: The redundancy for each uploaded assignment (default is 1)
     __assignments_per_hit__ = 1
-    # A datetime.timedelta indicating how long after upload before HIT expires
+    #: A datetime.timedelta indicating how long after upload before HIT expires
     __hit_expires_in__ = datetime.timedelta(days=7)
-    # The amount of time each turk has to complete the assignment
+    #: A datetime.timedelta indicating how long each turker has to complete
     __time_per_assignment__ = datetime.timedelta(hours=1)
-    # The amount of time to review submitted assignments before auto approval
+    #: The amount of time to review submitted assignments before auto approval
     __auto_approval_delay__ = datetime.timedelta(hours=8)
-    # The currency code for prices
+    #: The currency code for prices
     __currency_code__ = 'USD'
 
     def __init__(self, **assignment_params):

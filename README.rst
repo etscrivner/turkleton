@@ -30,6 +30,8 @@ Here's how you would define a task template to be uploaded:
 
 .. code-block:: python
 
+   import datetime
+
    from turkleton.assignment import task
    
    class MyTask(task.BaseTask):
@@ -38,6 +40,7 @@ Here's how you would define a task template to be uploaded:
        __reward__ = 0.25
        __title__ = 'Guess How Old From Picture'
        __description__ = 'Look at a picture and guess how old the person is.'
+       __time_per_assignment__ = datetime.timedelta(minutes=5)
 
 
 Now that we've defined our assignment we can easily upload it to Mechanical
