@@ -95,8 +95,10 @@ automatically parse answers to the various questions:
     
     class MyAssignment(assignment.BaseAssignment):
         categories = answers.MultiChoiceAnswer(question_name='Categories')
-        notes = answers.TextAnswer(question_name='AdditionalNotes')
-        does_not_match_any = answers.BooleanAnswer(question_name='DoesNotMatchAnyCategories')
+        notes = answers.TextAnswer(question_name='AdditionalNotes', default='')
+        does_not_match_any = answers.BooleanAnswer(
+            question_name='DoesNotMatchAnyCategories', default=False
+        )
 
 You can then download all of the HITs in a given batch as follows:
 
@@ -112,7 +114,7 @@ download the assignments, review them, and then dispose of the HIT as follows:
 
     for each in MyAssignment.get_by_hit_id(mturk_connection, hit.hit_id):
         print('{} - {} - {}'.format(each.categories, each.notes, each.does_not_match_any))
-        if each.is_valid():
+        if is_valid_assignment(each):
             each.accept('Good job!')
         else:
             each.reject('Assignment does not follow instructions.')
