@@ -5,32 +5,51 @@
     Representations for HITs
 
 """
-import collections
-
 from six import moves
 
+from turkleton import errors
 from turkleton import utils
 
 
-# Simplified tuple representation of a HIT
-HIT = collections.namedtuple('HIT', ['hit_id', 'batch_id'])
+class HIT(object):
+    """Simple internal representation of a Mechanical Turk human intelligence
+    task (HIT)."""
 
+    def __init__(self, hit_id, batch_id):
+        """Initialize a HIT"""
+        self.hit_id = hit_id
+        self.batch_id = batch_id
 
-def make_hit(raw_hit):
-    """Safely convert a raw boto hit into internal representation.
+    @classmethod
+    def create_from_boto_hit(cls, raw_hit):
+        """Safely convert a raw boto hit into internal representation.
 
-    :param raw_hit: A raw hit
-    :type raw_hit: boto.mturk.HIT
-    :rtype: turkleton.assignment.hit.HIT
-    """
-    return HIT(
-        hit_id=utils.safe_get_attr(raw_hit, 'HITId'),
-        batch_id=utils.safe_get_attr(raw_hit, 'RequesterAnnotation')
-    )
+        :param raw_hit: A raw hit
+        :type raw_hit: boto.mturk.HIT
+        :rtype: turkleton.assignment.hit.HIT
+        """
+        if not raw_hit:
+            raise errors.Error('Invalid HIT given.')
+
+        return cls(
+            hit_id=utils.safe_get_attr(raw_hit, 'HITId'),
+            batch_id=utils.safe_get_attr(raw_hit, 'RequesterAnnotation')
+        )
+
+    def dispose(self, boto_connection):
+        """Dispose of this HIT using the given boto connection.
+
+        :param boto_connection: A boto connection
+        :type boto_connection: boto.mturk.MTurkConnection
+        """
+        if not self.hit_id:
+            raise errors.Error('None HIT id for disposal.')
+
+        boto_connection.dispose_hit(self.hit_id)
 
 
 def transform_raw_hits(hits):
-    """Convert raw hits into internal hits representation
+    """Convert multiple raw hits into internal hits representation
 
     :param hits: A list of HITs
     :type hits: list of boto.mturk.HIT
@@ -39,7 +58,7 @@ def transform_raw_hits(hits):
     if not hits:
         return []
 
-    return moves.map(make_hit, hits)
+    return moves.map(HIT.create_from_boto_hit, hits)
 
 
 def get_all(boto_connection):

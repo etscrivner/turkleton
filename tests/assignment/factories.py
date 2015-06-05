@@ -44,6 +44,7 @@ def make_boto_assignment(values):
 
     :param values: A dictionary mapping question names to values
     :type values: dict
+    :rtype: mock.MagicMock
     """
     assignment = mock.MagicMock()
     assignment.AssignmentId = str(uuid.uuid4())
@@ -60,9 +61,10 @@ def make_boto_assignment(values):
     return assignment
 
 
-def make_hit(hit_id=None, batch_id=None):
+def make_boto_hit(hit_id=None, batch_id=None):
     """Create a new random HIT.
 
+    :rtype: mock.MagicMock
     """
     hit = mock.MagicMock()
     hit.HITId = (hit_id if hit_id else str(uuid.uuid4()))

@@ -112,4 +112,4 @@ download the assignments, review them, and then dispose of the HIT as follows:
             each.accept('Good job!')
         else:
             each.reject('Assignment does not follow instructions.')
-    hit.dispose()
+    hit.dispose(mturk_connection)
