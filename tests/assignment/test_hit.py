@@ -7,18 +7,46 @@ from tests.assignment import factories
 from turkleton.assignment import hit
 
 
-class TestInBatch(unittest.TestCase):
+class TestTransformRawHits(unittest.TestCase):
 
-    def test_should_return_false_if_batch_id_is_none(self):
-        fake_hit = factories.make_hit()
-        self.assertFalse(hit.in_batch(None, fake_hit))
+    def test_should_return_empty_list_when_none_given(self):
+        self.assertEqual([], hit.transform_raw_hits(None))
 
-    def test_should_return_false_if_none_given_for_hit(self):
-        self.assertFalse(hit.in_batch('1234', None))
+    def test_should_return_empty_list_when_empty_list_given(self):
+        self.assertEqual([], hit.transform_raw_hits([]))
 
-    def test_should_return_true_if_batch_in_hit(self):
-        fake_hit = factories.make_hit()
-        self.assertTrue(hit.in_batch(fake_hit.RequesterAnnotation, fake_hit))
+    def test_should_return_appropriately_transformed_hits(self):
+        fixture = [factories.make_hit() for _ in range(10)]
+        fixture_hit_ids = [each.HITId for each in fixture]
+        result = hit.transform_raw_hits(fixture)
+        self.assertEqual(10, len(result))
+        self.assertTrue(
+            all([each.hit_id in fixture_hit_ids for each in result])
+        )
+
+
+class TestGetAllByBatchId(unittest.TestCase):
+
+    def setUp(self):
+        super(TestGetAllByBatchId, self).setUp()
+        self.mock_connection = mock.MagicMock()
+
+    def test_test_should_return_empty_list_if_no_results(self):
+        self.mock_connection.get_all_hits.return_value = []
+        self.assertEqual(
+            [],
+            hit.get_all_by_batch_id(self.mock_connection, '1234')
+        )
+
+    def test_should_return_hit_ids_that_are_in_batch(self):
+        fake_hits = [
+            factories.make_hit(batch_id='1234'),
+            factories.make_hit(batch_id='4567')
+        ]
+        self.mock_connection.get_all_hits.return_value = fake_hits
+        result = hit.get_all_by_batch_id(self.mock_connection, '1234')
+        self.assertEqual(1, len(result))
+        self.assertEqual(result[0].hit_id, fake_hits[0].HITId)
 
 
 class TestGetReviewableByBatchId(unittest.TestCase):

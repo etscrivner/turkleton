@@ -10,22 +10,38 @@ import functools
 
 
 # Simplified tuple representation of a HIT
-HIT = collections.namedtuple('HIT', ['hit_id'])
+HIT = collections.namedtuple('HIT', ['hit_id', 'batch_id'])
 
 
-def in_batch(batch_id, hit):
-    """Indicates whether or not the given HIT is in a batch.
+def transform_raw_hits(hits):
+    """Convert raw hits into internal hits representation
 
+    :param hits: A list of HITs
+    :type hits: list of boto.mturk.HIT
+    :rtype: list of HIT
+    """
+    if not hits:
+        return []
+
+    return [
+        HIT(hit_id=each.HITId, batch_id=each.RequesterAnnotation)
+        for each in hits
+    ]
+
+
+def get_all_by_batch_id(boto_connection, batch_id):
+    """Get all HITs with the given batch id.
+
+    :param boto_connection: A boto connection
+    :type boto_connection: mturk.boto.MTurkConnection
     :param batch_id: A batch id
     :type batch_id: str or unicode
-    :param hit: A HIT
-    :type hit: boto.mturk.HIT
-    :rtype: bool
+    :rtype: iterable of HIT
     """
-    try:
-        return str(batch_id) in hit.RequesterAnnotation
-    except AttributeError:
-        return False
+    all_hits = transform_raw_hits(
+        boto_connection.get_all_hits()
+    )
+    return filter(lambda x: x.batch_id == batch_id, all_hits)
 
 
 def get_reviewable_by_batch_id(boto_connection, batch_id):
@@ -37,8 +53,7 @@ def get_reviewable_by_batch_id(boto_connection, batch_id):
     :type batch_id: str or unicode
     :rtype: iterable of HIT
     """
-    is_in_batch = functools.partial(in_batch, batch_id)
-    return [
-        HIT(hit_id=each.HITId) for each
-        in filter(is_in_batch, boto_connection.get_reviewable_hits(batch_id))
-    ]
+    all_reviewable_hits = transform_raw_hits(
+        boto_connection.get_reviewable_hits(batch_id)
+    )
+    return filter(lambda x: x.batch_id == batch_id, all_reviewable_hits)
