@@ -58,3 +58,13 @@ def make_boto_assignment(values):
         assignment.answers[0].append(answer_mock)
 
     return assignment
+
+
+def make_hit(hit_id=None, batch_id=None):
+    """Create a new random HIT.
+
+    """
+    hit = mock.MagicMock()
+    hit.HITId = (hit_id if hit_id else str(uuid.uuid4()))
+    hit.RequesterAnnotation = (batch_id if batch_id else str(uuid.uuid4()))
+    return hit

@@ -94,7 +94,7 @@ You can then download all of the HITs in a given batch as follows:
     reviewable_hits = hit.get_reviewable_in_batch(mturk_connection, '1234')
 
 Each HIT may then have multiple assignments associated with it. You can
-download the assignments, review them, and then dispost of the HIT as follows:
+download the assignments, review them, and then dispose of the HIT as follows:
 
 .. code-block:: python
 

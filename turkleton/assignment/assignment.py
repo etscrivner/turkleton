@@ -69,6 +69,21 @@ class BaseAssignment(object):
             answer = get_answer_to_question(self.assignment, question_name)
             setattr(self, attr_name, answer)
 
+    @classmethod
+    def get_by_hit_id(cls, boto_connection, hit_id):
+        """Retrieve assignments over the given connection for the given HIT.
+
+        :param boto_connection: A boto connection
+        :type boto_connection: boto.mturk.MTurkConnection
+        :param hit_id: A HIT id
+        :type hit_id: str or unicode
+        :rtype: list of BaseAssignment
+        """
+        return [
+            cls(each, boto_connection) for each
+            in boto_connection.get_assignments(hit_id)
+        ]
+
     @property
     def assignment_id(self):
         """Return the ID associated with this assignment.

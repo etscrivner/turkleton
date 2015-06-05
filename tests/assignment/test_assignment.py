@@ -156,3 +156,27 @@ class TestReject(BaseAssignmentTestCase):
             self.fake_assignment.assignment_id,
             'Bad job!'
         )
+
+
+class TestGetByHitId(BaseAssignmentTestCase):
+
+    def setUp(self):
+        super(TestGetByHitId, self).setUp()
+        self.mock_connection = mock.MagicMock()
+
+    def test_should_pass_correct_information_to_retrieval_method(self):
+        FakeAssignment.get_by_hit_id(
+            self.mock_connection, self.fake_assignment.hit_id
+        )
+        self.mock_connection.get_assignments.assert_called_once_with(
+            self.fake_assignment.hit_id
+        )
+
+    def test_should_wrap_assignment_class_around_each_result(self):
+        self.mock_connection.get_assignments.return_value = [
+            factories.make_boto_assignment(self.assignment_fixture)
+        ]
+        result = FakeAssignment.get_by_hit_id(self.mock_connection, '1234')
+        self.assertTrue(
+            all([isinstance(each, FakeAssignment) for each in result])
+        )
