@@ -53,23 +53,22 @@ you want a worker to complete. For example:
    from turkleton.assignment import task
    
    class MyTask(task.BaseTask):
-
        __layout_id__ = 'MY LAYOUT ID'
        __reward__ = 0.25
        __title__ = 'Guess How Old From Picture'
        __description__ = 'Look at a picture and guess how old the person is.'
+       __keywords__ = ['image', 'categorization']
        __time_per_assignment__ = datetime.timedelta(minutes=5)
 
-
 Here we've created a Task from an existing layout. Now that we've defined our
-task we can easily upload HITs using it to Mechanical Turk:
+task we can easily upload HITs by filling out the layout parameters:
 
 .. code-block:: python
 
    from turkleton import connection
 
    conn = connection.make_connection(AWS_ACCESS_KEY, AWS_SECRET_ACCESS_KEY)
-   task = MyTask({'image_url': 'http://test.com/img.png', 'first_guess': '29'})
+   task = MyTask(image_url='http://test.com/img.png', first_guess='29')
    hit = task.upload(conn, batch_id='1234')
 
 This will create a new assignment from the task template and upload it to
