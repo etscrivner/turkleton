@@ -24,11 +24,16 @@ Dead simple Python interfaces for Amazon Mechanical Turk.
 Features
 --------
 
-The presently existing APIs for Amazon Mechanical Turk require faaaar too much
-for you to get up and running. This API aims to simplify the whole process:
+The existing Python APIs for Mechanical Turk are thin wrappers at best - we can
+do better.
 
-* Interfaces for uploading assignments from pre-built layouts.
-* ORM-like interface for downloading and evaluating assignment results.
+Turkleton aims to leverage the expressive powers of Python to improve the whole
+situation. While still under active development, the main features are:
+
+* Simple interface for defining tasks from pre-built layouts.
+* Simple interface for defining schema of assignment results.
+* Easily upload tasks in batches.
+* Easily download and validate assignments.
 
 Examples
 --------
