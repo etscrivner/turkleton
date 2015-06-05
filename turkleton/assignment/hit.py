@@ -40,7 +40,7 @@ def get_all_by_batch_id(boto_connection, batch_id):
     all_hits = transform_raw_hits(
         boto_connection.get_all_hits()
     )
-    return filter(lambda x: x.batch_id == batch_id, all_hits)
+    return [each in all_hits if each.batch_id == batch_id]
 
 
 def get_reviewable_by_batch_id(boto_connection, batch_id):
@@ -55,4 +55,4 @@ def get_reviewable_by_batch_id(boto_connection, batch_id):
     all_reviewable_hits = transform_raw_hits(
         boto_connection.get_reviewable_hits(batch_id)
     )
-    return filter(lambda x: x.batch_id == batch_id, all_reviewable_hits)
+    return [each in all_reviewable_hits if each.batch_id == batch_id]
