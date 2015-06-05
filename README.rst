@@ -24,6 +24,9 @@ Dead simple Python interfaces for Amazon Mechanical Turk.
 Features
 --------
 
+The presently existing APIs for Amazon Mechanical Turk require faaaar too much
+for you to get up and running. This API aims to simplify the whole process:
+
 * Interfaces for uploading assignments from pre-built layouts.
 * ORM-like interface for downloading and evaluating assignment results.
 
@@ -33,11 +36,12 @@ Examples
 In turkleton there are several objects to be aware of: Tasks, HITs, and
 Assignments. A Task is a template from which HITs are created. A HIT
 corresponds to HIT in the Amazon Mechanical Turk API and represents an uploaded
-Task. Assignments are contained within HITs and represents the set of answers
-submitted by a single worker. A HIT can have many Assignments.
+Task. Assignments are contained within HITs. An individual Assignment
+represents the set of answers submitted by a single worker. A HIT can have many
+Assignments.
 
-Creating And Uploading HITs
-^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Creating A Task And Uploading It
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 To define a HIT you create a Task representing the template of the assignment
 you want a worker to complete. For example:
@@ -73,7 +77,7 @@ Mechanical Turk. The optional batch_id parameter allows you to set the
 annotation for the task to an arbitrary string that you can use to retrieve
 tasks later in batches.
 
-Downloading HIT Results
+Downloading The Results
 ^^^^^^^^^^^^^^^^^^^^^^^
 
 To download results for a HIT you first need to define an assignment. The

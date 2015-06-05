@@ -6,7 +6,6 @@
 
 """
 import collections
-import functools
 
 
 # Simplified tuple representation of a HIT
