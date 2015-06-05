@@ -24,6 +24,13 @@ class TestTransformRawHits(unittest.TestCase):
             all([each.hit_id in fixture_hit_ids for each in result])
         )
 
+    def test_should_set_property_to_none_if_attribute_not_found(self):
+        fixture = [factories.make_hit()]
+        del fixture[0].RequesterAnnotation
+        result = list(hit.transform_raw_hits(fixture))
+        self.assertEqual(1, len(result))
+        self.assertIsNone(result[0].batch_id)
+
 
 class TestGetAll(unittest.TestCase):
 

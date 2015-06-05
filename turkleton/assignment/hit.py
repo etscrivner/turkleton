@@ -6,11 +6,27 @@
 
 """
 import collections
+
 from six import moves
+
+from turkleton import utils
 
 
 # Simplified tuple representation of a HIT
 HIT = collections.namedtuple('HIT', ['hit_id', 'batch_id'])
+
+
+def make_hit(raw_hit):
+    """Safely convert a raw boto hit into internal representation.
+
+    :param raw_hit: A raw hit
+    :type raw_hit: boto.mturk.HIT
+    :rtype: turkleton.assignment.hit.HIT
+    """
+    return HIT(
+        hit_id=utils.safe_get_attr(raw_hit, 'HITId'),
+        batch_id=utils.safe_get_attr(raw_hit, 'RequesterAnnotation')
+    )
 
 
 def transform_raw_hits(hits):
@@ -23,10 +39,7 @@ def transform_raw_hits(hits):
     if not hits:
         return []
 
-    return moves.map(
-        lambda each: HIT(hit_id=each.HITId, batch_id=each.RequesterAnnotation),
-        hits
-    )
+    return moves.map(make_hit, hits)
 
 
 def get_all(boto_connection):
