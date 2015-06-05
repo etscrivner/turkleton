@@ -12,6 +12,10 @@ turkleton
 .. image:: https://img.shields.io/pypi/v/turkleton.svg
         :target: https://pypi.python.org/pypi/turkleton
 
+.. image:: https://readthedocs.org/projects/turkleton/badge/?version=latest
+   :target: https://readthedocs.org/projects/turkleton/?badge=latest
+   :alt: Documentation Status
+
 Dead simple Python interfaces for Amazon Mechanical Turk.
 
 * Free software: BSD license
