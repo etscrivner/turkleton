@@ -15,16 +15,17 @@ with open('HISTORY.rst') as history_file:
     history = history_file.read().replace('.. :changelog:', '')
 
 requirements = [
-    # TODO: put package requirements here
+    'boto',
+    'six'
 ]
 
 test_requirements = [
-    # TODO: put package test requirements here
+    'mock'
 ]
 
 setup(
     name='turkleton',
-    version='0.1.1',
+    version='1.0.0',
     description="Simplified interfaces for assignments on Mechanical Turk.",
     long_description=readme + '\n\n' + history,
     author="Eric Scrivner",
@@ -43,7 +44,7 @@ setup(
     zip_safe=False,
     keywords='turkleton',
     classifiers=[
-        'Development Status :: 2 - Pre-Alpha',
+        'Development Status :: 5 - Production/Stable',
         'Intended Audience :: Developers',
         'License :: OSI Approved :: BSD License',
         'Natural Language :: English',
