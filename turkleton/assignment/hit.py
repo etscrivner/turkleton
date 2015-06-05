@@ -6,7 +6,7 @@
 
 """
 import collections
-import itertools
+from six import moves
 
 
 # Simplified tuple representation of a HIT
@@ -23,7 +23,7 @@ def transform_raw_hits(hits):
     if not hits:
         return []
 
-    return itertools.imap(
+    return moves.map(
         lambda each: HIT(hit_id=each.HITId, batch_id=each.RequesterAnnotation),
         hits
     )
@@ -48,7 +48,7 @@ def get_all_by_batch_id(boto_connection, batch_id):
     :type batch_id: str or unicode
     :rtype: iterable of HIT
     """
-    return itertools.ifilter(
+    return moves.filter(
         lambda each: each.batch_id == batch_id,
         get_all(boto_connection)
     )
