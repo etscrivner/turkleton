@@ -103,3 +103,7 @@ class TestMultiChoiceAnswer(unittest.TestCase):
     def test_should_correctly_handle_multi_items(self):
         self.descriptor_class.prop = 'Face|Neck|Hands'
         self.assertEqual(['Face', 'Neck', 'Hands'], self.descriptor_class.prop)
+
+    def test_should_correctly_handle_list_of_items(self):
+        self.descriptor_class.prop = ['Face', 'Neck', 'Hands']
+        self.assertEqual(['Face', 'Neck', 'Hands'], self.descriptor_class.prop)

@@ -96,4 +96,6 @@ class MultiChoiceAnswer(BaseAnswer):
     def __set__(self, obj, val):
         """In Mechanical Turk multi-choice answers come across as text answers
         separated by the pipe (|) character. Handle this type of input here"""
-        self.value = val.split('|') if val else self._EMPTY
+        self.value = val
+        if isinstance(val, six.string_types):
+            self.value = val.split('|') if val else self._EMPTY
