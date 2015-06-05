@@ -6,6 +6,7 @@
 
 """
 import collections
+import itertools
 
 
 # Simplified tuple representation of a HIT
@@ -17,15 +18,25 @@ def transform_raw_hits(hits):
 
     :param hits: A list of HITs
     :type hits: list of boto.mturk.HIT
-    :rtype: list of HIT
+    :rtype: iterable of HIT
     """
     if not hits:
         return []
 
-    return [
-        HIT(hit_id=each.HITId, batch_id=each.RequesterAnnotation)
-        for each in hits
-    ]
+    return itertools.imap(
+        lambda each: HIT(hit_id=each.HITId, batch_id=each.RequesterAnnotation),
+        hits
+    )
+
+
+def get_all(boto_connection):
+    """Get all HITs
+
+    :param boto_connection: A boto connection
+    :type boto_connection: boto.mturk.MTurkConnection
+    :rtype: iterable of HIT
+    """
+    return transform_raw_hits(boto_connection.get_all_hits())
 
 
 def get_all_by_batch_id(boto_connection, batch_id):
@@ -37,10 +48,10 @@ def get_all_by_batch_id(boto_connection, batch_id):
     :type batch_id: str or unicode
     :rtype: iterable of HIT
     """
-    all_hits = transform_raw_hits(
-        boto_connection.get_all_hits()
+    return itertools.ifilter(
+        lambda each: each.batch_id == batch_id,
+        get_all(boto_connection)
     )
-    return [each for each in all_hits if each.batch_id == batch_id]
 
 
 def get_reviewable_by_batch_id(boto_connection, batch_id):

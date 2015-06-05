@@ -44,10 +44,10 @@ test-all:
 	tox
 
 coverage:
-	coverage run --source turkleton setup.py test
+	coverage run --source=turkleton --include=turkleton setup.py test
 	coverage report -m
 	coverage html
-	open htmlcov/index.html
+	xdg-open htmlcov/index.html
 
 docs:
 	rm -f docs/turkleton.rst

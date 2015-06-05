@@ -99,7 +99,7 @@ You can then download all of the HITs in a given batch as follows:
 .. code-block:: python
 
     from turkleton.assignment import hit
-    reviewable_hits = hit.get_reviewable_in_batch(mturk_connection, '1234')
+    reviewable_hits = hit.get_reviewable_by_batch_id(mturk_connection, '1234')
 
 Each HIT may then have multiple assignments associated with it. You can
 download the assignments, review them, and then dispose of the HIT as follows:
