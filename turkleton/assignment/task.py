@@ -11,6 +11,7 @@ import datetime
 from boto.mturk import layoutparam
 from boto.mturk import price
 
+from turkleton import connection
 from turkleton import errors
 
 
@@ -94,11 +95,9 @@ class BaseTask(object):
             if getattr(self, each) is None:
                 raise self.ValidationError('Task is missing {}.'.format(each))
 
-    def upload(self, mturk_connection, batch_id=None):
+    def upload(self, batch_id=None):
         """Attempt to upload this task to mechanical turk.
 
-        :param mturk_connection: A mechanical turk connection
-        :type mturk_connection: boto.mturk.connection.MTurkConnection
         :param batch_id: An optional ID to attach to this object
         :type batch_id: mixed
         """
@@ -110,7 +109,7 @@ class BaseTask(object):
             currency_code=self.__currency_code__
         )
         keywords = keywords_from_list(self.__keywords__)
-        return mturk_connection.create_hit(
+        return connection.get_connection().create_hit(
             hit_layout=self.__layout_id__,
             reward=reward_price,
             title=self.__title__,

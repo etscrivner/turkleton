@@ -4,8 +4,9 @@ import unittest
 from boto.mturk import price
 import mock
 
-from turkleton.assignment import task
 from tests.assignment import factories
+from turkleton import connection
+from turkleton.assignment import task
 
 
 class TestTaskUpload(unittest.TestCase):
@@ -29,9 +30,10 @@ class TestTaskUpload(unittest.TestCase):
         )
         self.batch_id_fixture = '1234'
 
+        connection.set_connection(self.mock_connection)
+
     def mocked_upload(self):
         return self.categorization_task.upload(
-            mturk_connection=self.mock_connection,
             batch_id=self.batch_id_fixture
         )
 

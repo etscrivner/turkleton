@@ -5,6 +5,7 @@
     Representations for the results from uploaded HITs.
 
 """
+from turkleton import connection
 from turkleton import errors
 from turkleton.assignment import answer
 
@@ -50,37 +51,32 @@ def get_answer_to_question(assignment, question_name):
 class BaseAssignment(object):
     """Base class for all assignments"""
 
-    def __init__(self, assignment, boto_connection=None):
+    def __init__(self, assignment):
         """Initialize this class with the given assignment.
 
         :param assignment: An assignment
         :type assignment: boto.mturk.Assignment
-        :param boto_connection: (Default is None) A connection to Mechanical
-            Turk.
-        :type boto_connection: boto.mturk.MTurkConnection or None
         """
         self.assignment = assignment
         self.question_to_attr = get_question_name_to_answer_attribute_table(
             self.__class__
         )
-        self.boto_connection = boto_connection
 
         for question_name, attr_name in self.question_to_attr.items():
             answer = get_answer_to_question(self.assignment, question_name)
             setattr(self, attr_name, answer)
 
     @classmethod
-    def get_by_hit_id(cls, boto_connection, hit_id):
+    def get_by_hit_id(cls, hit_id):
         """Retrieve assignments over the given connection for the given HIT.
 
-        :param boto_connection: A boto connection
-        :type boto_connection: boto.mturk.MTurkConnection
         :param hit_id: A HIT id
         :type hit_id: str or unicode
         :rtype: list of BaseAssignment
         """
+        boto_connection = connection.get_connection()
         return [
-            cls(each, boto_connection) for each
+            cls(each) for each
             in boto_connection.get_assignments(hit_id)
         ]
 
@@ -114,9 +110,8 @@ class BaseAssignment(object):
         :param message: A message to send to the turker
         :type message: str or unicode
         """
-        if not self.boto_connection:
-            raise errors.ConnectionError('Assignment has no boto connection.')
-        self.boto_connection.approve_assignment(self.assignment_id, message)
+        boto_connection = connection.get_connection()
+        boto_connection.approve_assignment(self.assignment_id, message)
 
     def reject(self, message):
         """Reject this assignment with the given message.
@@ -124,6 +119,5 @@ class BaseAssignment(object):
         :param message: A message to send to the turker
         :type message: str or unicode
         """
-        if not self.boto_connection:
-            raise errors.ConnectionError('Assignment has no boto connection.')
-        self.boto_connection.reject_assignment(self.assignment_id, message)
+        boto_connection = connection.get_connection()
+        boto_connection.reject_assignment(self.assignment_id, message)

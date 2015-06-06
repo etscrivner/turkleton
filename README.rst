@@ -54,6 +54,19 @@ Task. Assignments are contained within HITs. An individual Assignment
 represents the set of answers submitted by a single worker. A HIT can have many
 Assignments.
 
+Setting Up Your Connection
+^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Turkleton uses a per-process global connection. It should be initialized before
+you attempt to upload or download anything. You can initialize it like so:
+
+.. code-block:: python
+
+   from turkleton import connection
+   connection.setup(AWS_ACCESS_KEY, AWS_SECRET_ACCESS_KEY)
+
+That's it!
+
 Creating A Task And Uploading It
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
@@ -78,12 +91,8 @@ Here we've created a Task from an existing layout. Now that we've defined our
 task we can easily upload HITs by filling out the layout parameters:
 
 .. code-block:: python
-
-   from turkleton import connection
-
-   conn = connection.make_connection(AWS_ACCESS_KEY, AWS_SECRET_ACCESS_KEY)
    task = MyTask(image_url='http://test.com/img.png', first_guess='29')
-   hit = task.upload(conn, batch_id='1234')
+   hit = task.upload(batch_id='1234')
 
 This will create a new assignment from the task template and upload it to
 Mechanical Turk. The optional batch_id parameter allows you to set the
@@ -114,17 +123,17 @@ You can then download all of the HITs in a given batch as follows:
 .. code-block:: python
 
     from turkleton.assignment import hit
-    reviewable_hits = hit.get_reviewable_by_batch_id(mturk_connection, '1234')
+    reviewable_hits = hit.get_reviewable_by_batch_id('1234')
 
 Each HIT may then have multiple assignments associated with it. You can
 download the assignments, review them, and then dispose of the HIT as follows:
 
 .. code-block:: python
 
-    for each in MyAssignment.get_by_hit_id(mturk_connection, hit.hit_id):
+    for each in MyAssignment.get_by_hit_id(hit.hit_id):
         print('{} - {} - {}'.format(each.categories, each.notes, each.does_not_match_any))
         if is_valid_assignment(each):
             each.accept('Good job!')
         else:
             each.reject('Assignment does not follow instructions.')
-    hit.dispose(mturk_connection)
+    hit.dispose()

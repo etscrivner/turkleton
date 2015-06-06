@@ -7,6 +7,7 @@
 """
 from six import moves
 
+from turkleton import connection
 from turkleton import errors
 from turkleton import utils
 
@@ -36,16 +37,12 @@ class HIT(object):
             batch_id=utils.safe_get_attr(raw_hit, 'RequesterAnnotation')
         )
 
-    def dispose(self, boto_connection):
-        """Dispose of this HIT using the given boto connection.
-
-        :param boto_connection: A boto connection
-        :type boto_connection: boto.mturk.MTurkConnection
-        """
+    def dispose(self):
+        """Dispose of this HIT. """
         if not self.hit_id:
             raise errors.Error('None HIT id for disposal.')
 
-        boto_connection.dispose_hit(self.hit_id)
+        connection.get_connection().dispose_hit(self.hit_id)
 
 
 def transform_raw_hits(hits):
@@ -61,40 +58,32 @@ def transform_raw_hits(hits):
     return moves.map(HIT.create_from_boto_hit, hits)
 
 
-def get_all(boto_connection):
+def get_all():
     """Get all HITs
 
-    :param boto_connection: A boto connection
-    :type boto_connection: boto.mturk.MTurkConnection
     :rtype: iterable of HIT
     """
-    return transform_raw_hits(boto_connection.get_all_hits())
+    return transform_raw_hits(connection.get_connection().get_all_hits())
 
 
-def get_all_by_batch_id(boto_connection, batch_id):
+def get_all_by_batch_id(batch_id):
     """Get all HITs with the given batch id.
 
-    :param boto_connection: A boto connection
-    :type boto_connection: mturk.boto.MTurkConnection
     :param batch_id: A batch id
     :type batch_id: str or unicode
     :rtype: iterable of HIT
     """
-    return moves.filter(
-        lambda each: each.batch_id == batch_id,
-        get_all(boto_connection)
-    )
+    return moves.filter(lambda each: each.batch_id == batch_id, get_all())
 
 
-def get_reviewable_by_batch_id(boto_connection, batch_id):
+def get_reviewable_by_batch_id(batch_id):
     """Get all reviewable HITs within the given batch.
 
-    :param boto_connection: A boto connection
-    :type boto_connection: mturk.boto.MTurkConnection
     :param batch_id: A batch id
     :type batch_id: str or unicode
     :rtype: iterable of HIT
     """
+    boto_connection = connection.get_connection()
     all_reviewable_hits = transform_raw_hits(
         boto_connection.get_reviewable_hits(batch_id)
     )

@@ -22,7 +22,7 @@ class BaseConnectionTestCase(unittest.TestCase):
         super(BaseConnectionTestCase, self).tearDown()
         self.patch.__exit__()
 
-    def assert_make_connection_call_contains(self, argument_name, val):
+    def assert_boto_connection_call_contains(self, argument_name, val):
         """Assert that the make connection call contains the given argument.
 
         :param argument_name: The argument name
@@ -37,59 +37,74 @@ class BaseConnectionTestCase(unittest.TestCase):
         )
 
 
-class TestMakeConnection(BaseConnectionTestCase):
+class TestGlobalConnection(unittest.TestCase):
 
-    def make_connection(self):
-        return connection.make_connection(
+    def test_should_initially_raise_error(self):
+        self.assertRaisesRegexp(
+            connection.ConnectionError,
+            r'It is required that you setup\(\) turkleton before use.',
+            connection.get_connection
+        )
+
+    def test_should_take_value_after_set(self):
+        fixture = 'Herp'
+        connection.set_connection(fixture)
+        self.assertEqual(fixture, connection.get_connection())
+
+
+class TestSetup(BaseConnectionTestCase):
+
+    def setup_connection(self):
+        return connection.setup(
             self.access_key_fixture, self.secret_access_key_fixture
         )
 
     def test_should_pass_along_correct_access_key(self):
-        self.make_connection()
-        self.assert_make_connection_call_contains(
+        self.setup_connection()
+        self.assert_boto_connection_call_contains(
             'aws_access_key_id', self.access_key_fixture
         )
 
     def test_should_pass_along_correct_secret_access_key(self):
-        self.make_connection()
-        self.assert_make_connection_call_contains(
+        self.setup_connection()
+        self.assert_boto_connection_call_contains(
             'aws_secret_access_key', self.secret_access_key_fixture
         )
 
     def test_should_return_mturk_connection(self):
         self.assertEqual(
-            self.make_connection(), self.mturk_connection()
+            self.setup_connection(), self.mturk_connection()
         )
 
 
-class TestMakeSandboxConnection(BaseConnectionTestCase):
+class TestSetupSandbox(BaseConnectionTestCase):
 
-    def make_sandbox_connection(self):
-        return connection.make_sandbox_connection(
+    def setup_sandbox(self):
+        return connection.setup_sandbox(
             self.access_key_fixture, self.secret_access_key_fixture
         )
 
     def test_should_pass_along_correct_access_key(self):
-        self.make_sandbox_connection()
-        self.assert_make_connection_call_contains(
+        self.setup_sandbox()
+        self.assert_boto_connection_call_contains(
             'aws_access_key_id', self.access_key_fixture
         )
 
     def test_should_pass_along_correct_secret_access_key(self):
-        self.make_sandbox_connection()
-        self.assert_make_connection_call_contains(
+        self.setup_sandbox()
+        self.assert_boto_connection_call_contains(
             'aws_secret_access_key', self.secret_access_key_fixture
         )
 
     def test_should_pass_along_correct_host(self):
-        self.make_sandbox_connection()
-        self.assert_make_connection_call_contains(
+        self.setup_sandbox()
+        self.assert_boto_connection_call_contains(
             'host', connection.MTURK_SANDBOX_HOST
         )
 
     def test_should_return_mturk_connection(self):
         self.assertEqual(
-            self.make_sandbox_connection(), self.mturk_connection()
+            self.setup_sandbox(), self.mturk_connection()
         )
 
 

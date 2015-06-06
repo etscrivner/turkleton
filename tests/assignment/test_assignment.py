@@ -4,6 +4,7 @@ import unittest
 import mock
 
 from tests.assignment import factories
+from turkleton import connection
 from turkleton import errors
 from turkleton.assignment import answer
 from turkleton.assignment import assignment
@@ -126,14 +127,9 @@ class TestBaseAssignment(BaseAssignmentTestCase):
 
 class TestApprove(BaseAssignmentTestCase):
 
-    def test_should_raise_error_if_no_boto_connection_given(self):
-        with self.assertRaisesRegexp(errors.ConnectionError,
-                                     'Assignment has no boto connection.'):
-            self.fake_assignment.approve('Good job!')
-
     def test_should_pass_correct_information_to_boto_connection(self):
         mock_connection = mock.MagicMock()
-        self.fake_assignment.boto_connection = mock_connection
+        connection.set_connection(mock_connection)
         self.fake_assignment.approve('Good job!')
         mock_connection.approve_assignment.assert_called_once_with(
             self.fake_assignment.assignment_id,
@@ -143,14 +139,9 @@ class TestApprove(BaseAssignmentTestCase):
 
 class TestReject(BaseAssignmentTestCase):
 
-    def test_should_raise_error_if_no_boto_connection_given(self):
-        with self.assertRaisesRegexp(errors.ConnectionError,
-                                     'Assignment has no boto connection.'):
-            self.fake_assignment.reject('Bad job!')
-
     def test_should_pass_correct_arguments_to_connection(self):
         mock_connection = mock.MagicMock()
-        self.fake_assignment.boto_connection = mock_connection
+        connection.set_connection(mock_connection)
         self.fake_assignment.reject('Bad job!')
         mock_connection.reject_assignment.assert_called_once_with(
             self.fake_assignment.assignment_id,
@@ -163,10 +154,11 @@ class TestGetByHitId(BaseAssignmentTestCase):
     def setUp(self):
         super(TestGetByHitId, self).setUp()
         self.mock_connection = mock.MagicMock()
+        connection.set_connection(self.mock_connection)
 
     def test_should_pass_correct_information_to_retrieval_method(self):
         FakeAssignment.get_by_hit_id(
-            self.mock_connection, self.fake_assignment.hit_id
+            self.fake_assignment.hit_id
         )
         self.mock_connection.get_assignments.assert_called_once_with(
             self.fake_assignment.hit_id
@@ -176,7 +168,7 @@ class TestGetByHitId(BaseAssignmentTestCase):
         self.mock_connection.get_assignments.return_value = [
             factories.make_boto_assignment(self.assignment_fixture)
         ]
-        result = FakeAssignment.get_by_hit_id(self.mock_connection, '1234')
+        result = FakeAssignment.get_by_hit_id('1234')
         self.assertTrue(
             all([isinstance(each, FakeAssignment) for each in result])
         )
