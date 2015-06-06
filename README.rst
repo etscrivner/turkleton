@@ -21,6 +21,15 @@ Dead simple Python interfaces for Amazon Mechanical Turk.
 * Free software: BSD license
 * Documentation: https://turkleton.readthedocs.org.
 
+Installation
+------------
+
+Simply use pip to download the package from PyPI
+
+.. code-block:: shell
+
+   $ pip install turkleton
+
 Features
 --------
 
