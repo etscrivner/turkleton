@@ -91,6 +91,7 @@ Here we've created a Task from an existing layout. Now that we've defined our
 task we can easily upload HITs by filling out the layout parameters:
 
 .. code-block:: python
+
    task = MyTask(image_url='http://test.com/img.png', first_guess='29')
    hit = task.upload(batch_id='1234')
 
