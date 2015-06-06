@@ -16,6 +16,7 @@ class BaseConnectionTestCase(unittest.TestCase):
         self.patch = mock.patch(
             'boto.mturk.connection.MTurkConnection'
         )
+        connection.set_connection(None)
         self.mturk_connection = self.patch.__enter__()
 
     def tearDown(self):
@@ -38,6 +39,10 @@ class BaseConnectionTestCase(unittest.TestCase):
 
 
 class TestGlobalConnection(unittest.TestCase):
+
+    def setUp(self):
+        super(TestGlobalConnection, self).setUp()
+        connection.set_connection(None)
 
     def test_should_initially_raise_error(self):
         self.assertRaisesRegexp(
