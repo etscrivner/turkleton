@@ -27,6 +27,14 @@ turkleton.errors module
     :undoc-members:
     :show-inheritance:
 
+turkleton.utils module
+----------------------
+
+.. automodule:: turkleton.utils
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
 
 Module contents
 ---------------
