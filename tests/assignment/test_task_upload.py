@@ -9,6 +9,47 @@ from turkleton import connection
 from turkleton.assignment import task
 
 
+class TestCreateAndUpload(unittest.TestCase):
+
+    def setUp(self):
+        super(TestCreateAndUpload, self).setUp()
+        self.params = {
+            'image_url': 'http://herp.com/derp'
+        }
+        self.mock_connection = mock.MagicMock()
+
+        connection.set_connection(self.mock_connection)
+
+    def test_should_pass_parameters_along(self):
+        result = factories.CategorizationTaskFixture.create_and_upload(
+            **self.params
+        )
+        self.assertEqual(self.params, result.assignment_params)
+
+    def test_should_remove_batch_id_if_given(self):
+        self.params['batch_id'] = '1234987'
+        result = factories.CategorizationTaskFixture.create_and_upload(
+            **self.params
+        )
+        self.assertNotIn('batch_id', result.assignment_params)
+
+    @mock.patch('turkleton.assignment.task.BaseTask.upload')
+    def test_should_call_upload(self, upload):
+        factories.CategorizationTaskFixture.create_and_upload(
+            **self.params
+        )
+        upload.assert_called_once(batch_id=None)
+
+    @mock.patch('turkleton.assignment.task.BaseTask.upload')
+    def test_should_pass_batch_id_to_upload_if_given(self, upload):
+        batch_id = '1234'
+        self.params['batch_id'] = batch_id
+        factories.CategorizationTaskFixture.create_and_upload(
+            **self.params
+        )
+        upload.assert_called_once_with(batch_id=batch_id)
+
+
 class TestTaskUpload(unittest.TestCase):
 
     def setUp(self):
@@ -112,6 +153,13 @@ class TestTaskUpload(unittest.TestCase):
     def test_should_use_correct_annotation(self):
         self.assert_upload_called_with(
             'annotation', self.batch_id_fixture
+        )
+
+    def test_should_use_global_batch_id_if_set(self):
+        self.batch_id_fixture = None
+        task.current_batch_id = '4567'
+        self.assert_upload_called_with(
+            'annotation', task.current_batch_id
         )
 
     def test_should_use_correct_layout_parameters(self):

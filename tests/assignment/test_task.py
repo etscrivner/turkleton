@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 import datetime
 import unittest
+import uuid
 
 from turkleton.assignment import task
 
@@ -129,6 +130,34 @@ class TestValidate(unittest.TestCase):
             "Task is missing __description__",
             self.base_task.validate
         )
+
+
+class TestBatchedUpload(unittest.TestCase):
+
+    def setUp(self):
+        super(TestBatchedUpload, self).setUp()
+        self.id_fixture = str(uuid.uuid4())
+        task.current_batch_id = None
+
+    def tearDown(self):
+        super(TestBatchedUpload, self).tearDown()
+        task.current_batch_id = None
+
+    def test_should_set_global_batch_id(self):
+        with task.batched_upload(self.id_fixture):
+            self.assertEqual(self.id_fixture, task.current_batch_id)
+
+    def test_should_return_current_batch_id_to_none_when_done(self):
+        with task.batched_upload(self.id_fixture):
+            pass
+        self.assertIsNone(task.current_batch_id)
+
+    def test_should_allow_for_nesting(self):
+        id_fixture_2 = str(uuid.uuid4())
+        with task.batched_upload(self.id_fixture):
+            with task.batched_upload(id_fixture_2):
+                self.assertEqual(id_fixture_2, task.current_batch_id)
+            self.assertEqual(self.id_fixture, task.current_batch_id)
 
 
 if __name__ == '__main__':

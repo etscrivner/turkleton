@@ -100,6 +100,23 @@ Mechanical Turk. The optional batch_id parameter allows you to set the
 annotation for the task to an arbitrary string that you can use to retrieve
 tasks later in batches.
 
+You can upload many tasks in a loop easily as follows:
+
+.. code-block:: python
+
+   for image_url in all_image_urls:
+       MyTask.create_and_upload(
+           image_url=image_url, first_guess='29', batch_id='1234'
+       )
+
+If you'd like to leave off the batch id you can also use the context manager:
+
+.. code-block:: python
+
+   with task.batched_upload(batch_id='1234')
+       for image_url in all_image_urls:
+          MyTask.create_and_upload(image_url=image_url, first_guess='29')
+
 Downloading The Results
 ^^^^^^^^^^^^^^^^^^^^^^^
 

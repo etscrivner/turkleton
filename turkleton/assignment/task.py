@@ -6,6 +6,7 @@
     assignment.
 
 """
+import contextlib
 import datetime
 
 from boto.mturk import layoutparam
@@ -13,6 +14,10 @@ from boto.mturk import price
 
 from turkleton import connection
 from turkleton import errors
+
+
+# The global per-process batch id for use in context managers
+current_batch_id = None
 
 
 def keywords_from_list(keywords):
@@ -43,6 +48,20 @@ def dict_to_layout_parameters(dict_to_convert):
         ]
 
     return layoutparam.LayoutParameters(params)
+
+
+@contextlib.contextmanager
+def batched_upload(batch_id):
+    """Upload all items within this context in the same batch.
+
+    :param batch_id: A batch id
+    :type batch_id: str or unicode
+    """
+    global current_batch_id
+    previous_batch_id = current_batch_id
+    current_batch_id = batch_id
+    yield
+    current_batch_id = previous_batch_id
 
 
 class BaseTask(object):
@@ -76,10 +95,24 @@ class BaseTask(object):
     def __init__(self, **assignment_params):
         """Initialize this object from the given keyword arguments
 
-        :param assignment_params: A dict of assignment parameters
+        :param assignment_params: Assignment parameters defined on MTurk.
         :type assignment_params: dict
         """
         self.assignment_params = assignment_params
+
+    @classmethod
+    def create_and_upload(cls, **assignment_params):
+        """Create a new task and upload it to Mechanical Turk.
+
+        :param assignment_params: Assignment parameters defined on MTurk.
+        :type assignment_params: dict
+        """
+        param_copy = assignment_params.copy()
+        batch_id = param_copy.pop('batch_id', None)
+
+        task_inst = cls(**param_copy)
+        task_inst.upload(batch_id=batch_id)
+        return task_inst
 
     def validate(self):
         """Validate the attributes of this class. Raises ValidationError if any
@@ -101,7 +134,11 @@ class BaseTask(object):
         :param batch_id: An optional ID to attach to this object
         :type batch_id: mixed
         """
+        global current_batch_id
+
         self.validate()
+
+        batch_id = batch_id if batch_id else current_batch_id
 
         params = dict_to_layout_parameters(self.assignment_params)
         reward_price = price.Price(
