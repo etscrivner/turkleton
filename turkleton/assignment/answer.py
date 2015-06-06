@@ -5,6 +5,8 @@
     Representations for various answer types from uploaded HITs.
 
 """
+import decimal
+
 import six
 
 
@@ -78,6 +80,26 @@ class BooleanAnswer(BaseAnswer):
         self.value = val
         if isinstance(val, six.string_types):
             self.value = self.string_to_bool.get(val, self._EMPTY)
+
+
+class IntegerAnswer(BaseAnswer):
+    """Represents an answer with an integer value"""
+
+    def __set__(self, obj, val):
+        """Casts the given value to an integer"""
+        self.value = int(val)
+
+
+class DecimalAnswer(BaseAnswer):
+    """Represents an answer with a decimal value"""
+
+    def __set__(self, obj, val):
+        """Casts the given value to a decimal.Decimal"""
+        self.value = decimal.Decimal(val)
+
+
+class SingleChoiceAnswer(TextAnswer):
+    """Represents an answer to a single-choice question"""
 
 
 class MultiChoiceAnswer(BaseAnswer):

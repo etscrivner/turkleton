@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+import decimal
 import unittest
 
 from turkleton.assignment import answer
@@ -80,6 +81,47 @@ class TestBooleanAnswer(unittest.TestCase):
         alternate_class = self.AlternateMappingDescriptorTestClass()
         alternate_class.prop = 'F'
         self.assertFalse(alternate_class.prop)
+
+
+class TestIntegerAnswer(unittest.TestCase):
+
+    class DescriptorTestClass(object):
+        """Test integer answer descriptor"""
+        prop = answer.IntegerAnswer('Herp', 0)
+
+    def setUp(self):
+        super(TestIntegerAnswer, self).setUp()
+        self.descriptor_class = self.DescriptorTestClass()
+
+    def test_should_initialy_be_default_value(self):
+        self.descriptor_class.prop = 0
+        self.assertEqual(0, self.descriptor_class.prop)
+
+    def test_should_correctly_cast_string_to_integer(self):
+        self.descriptor_class.prop = '123456'
+        self.assertEqual(123456, self.descriptor_class.prop)
+
+    def test_should_raise_error_if_value_given_is_not_integer(self):
+        with self.assertRaises(ValueError):
+            self.descriptor_class.prop = 'hello'
+
+
+class TestDecimalAnswer(unittest.TestCase):
+
+    class DescriptorTestClass(object):
+        prop = answer.DecimalAnswer('Herp', 0)
+
+    def setUp(self):
+        super(TestDecimalAnswer, self).setUp()
+        self.descriptor_class = self.DescriptorTestClass()
+
+    def test_should_correctly_convert_string_to_decimal_value(self):
+        self.descriptor_class.prop = '1.2345'
+        self.assertEqual(decimal.Decimal('1.2345'), self.descriptor_class.prop)
+
+    def test_should_raise_error_if_invalid_decimal_given(self):
+        with self.assertRaises(decimal.InvalidOperation):
+            self.descriptor_class.prop = 'hello'
 
 
 class TestMultiChoiceAnswer(unittest.TestCase):
