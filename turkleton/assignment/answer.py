@@ -5,6 +5,7 @@
     Representations for various answer types from uploaded HITs.
 
 """
+import collections
 import decimal
 
 import six
@@ -28,18 +29,18 @@ class BaseAnswer(object):
         """
         self.question_name = question_name
         self.default = default
-        self.value = self._EMPTY
+        self.value_store = collections.defaultdict(lambda: self._EMPTY)
 
     def __get__(self, obj, obtype):
         """Descriptor method for retrieving attribute value"""
-        if self.value is self._EMPTY:
+        if self.value_store[obj] is self._EMPTY:
             return self.default
 
-        return self.value
+        return self.value_store[obj]
 
     def __set__(self, obj, val):
         """Descriptor method for setting attribute value"""
-        self.value = val
+        self.value_store[obj] = val
 
 
 class TextAnswer(BaseAnswer):
@@ -77,9 +78,12 @@ class BooleanAnswer(BaseAnswer):
         """Set this value to the given answer. If a string it will attempt to
         convert it into a boolean.
         """
-        self.value = val
         if isinstance(val, six.string_types):
-            self.value = self.string_to_bool.get(val, self._EMPTY)
+            super(BooleanAnswer, self).__set__(
+                obj, self.string_to_bool.get(val, self._EMPTY)
+            )
+        else:
+            super(BooleanAnswer, self).__set__(obj, val)
 
 
 class IntegerAnswer(BaseAnswer):
@@ -87,7 +91,7 @@ class IntegerAnswer(BaseAnswer):
 
     def __set__(self, obj, val):
         """Casts the given value to an integer"""
-        self.value = int(val)
+        super(IntegerAnswer, self).__set__(obj, int(val))
 
 
 class DecimalAnswer(BaseAnswer):
@@ -95,7 +99,7 @@ class DecimalAnswer(BaseAnswer):
 
     def __set__(self, obj, val):
         """Casts the given value to a decimal.Decimal"""
-        self.value = decimal.Decimal(val)
+        super(DecimalAnswer, self).__set__(obj, decimal.Decimal(val))
 
 
 class SingleChoiceAnswer(TextAnswer):
@@ -111,13 +115,16 @@ class MultiChoiceAnswer(BaseAnswer):
     def __get__(self, obj, objtype):
         """Return the value or the default value. If default value is _DEFAULT then
         this will return an empty list"""
-        if self.value is self._EMPTY:
+        if self.value_store[obj] is self._EMPTY:
             return [] if self.default is self._DEFAULT else self.default
-        return self.value
+        return self.value_store[obj]
 
     def __set__(self, obj, val):
         """In Mechanical Turk multi-choice answers come across as text answers
         separated by the pipe (|) character. Handle this type of input here"""
-        self.value = val
         if isinstance(val, six.string_types):
-            self.value = val.split('|') if val else self._EMPTY
+            super(MultiChoiceAnswer, self).__set__(
+                obj, val.split('|') if val else self._EMPTY
+            )
+        else:
+            super(MultiChoiceAnswer, self).__set__(obj, val)

@@ -16,9 +16,9 @@ class TestSafeGetAttr(unittest.TestCase):
         self.mock_obj.herp = 'Herp'
         self.assertEqual(
             self.mock_obj.herp,
-            utils.safe_get_attr(self.mock_obj, 'herp')
+            utils.safe_getattr(self.mock_obj, 'herp')
         )
 
     def test_should_return_none_if_attribute_not_present(self):
         del self.mock_obj.herp
-        self.assertIsNone(utils.safe_get_attr(self.mock_obj, 'herp'))
+        self.assertIsNone(utils.safe_getattr(self.mock_obj, 'herp'))

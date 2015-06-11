@@ -7,7 +7,7 @@
 """
 
 
-def safe_get_attr(obj, attr_name):
+def safe_getattr(obj, attr_name):
     """Get the attribute of an object returning None if the attribute does not
     exist.
 

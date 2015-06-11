@@ -26,7 +26,10 @@ class TestBaseAnswer(unittest.TestCase):
         self.assertEqual(self.default_value, self.base_answer.default)
 
     def test_should_initially_contain_empty_value(self):
-        self.assertTrue(self.base_answer.value is answer.BaseAnswer._EMPTY)
+        self.assertTrue(
+            self.base_answer.value_store[self.base_answer]
+            is answer.BaseAnswer._EMPTY
+        )
 
     def test_should_return_default_value_if_empty(self):
         inst = self.DescriptorTestClass()
@@ -36,6 +39,14 @@ class TestBaseAnswer(unittest.TestCase):
         inst = self.DescriptorTestClass()
         inst.prop = 123
         self.assertEqual(123, inst.prop)
+
+    def test_should_preserve_values_across_separate_instances(self):
+        inst1 = self.DescriptorTestClass()
+        inst1.prop = '1'
+        inst2 = self.DescriptorTestClass()
+        inst2.prop = '2'
+        self.assertEqual('1', inst1.prop)
+        self.assertEqual('2', inst2.prop)
 
 
 class TestBooleanAnswer(unittest.TestCase):
@@ -82,6 +93,14 @@ class TestBooleanAnswer(unittest.TestCase):
         alternate_class.prop = 'F'
         self.assertFalse(alternate_class.prop)
 
+    def test_should_preserve_value_across_separate_instances(self):
+        desc1 = self.DescriptorTestClass()
+        desc1.prop = '1'
+        desc2 = self.DescriptorTestClass()
+        desc2.prop = '0'
+        self.assertTrue(desc1.prop)
+        self.assertFalse(desc2.prop)
+
 
 class TestIntegerAnswer(unittest.TestCase):
 
@@ -105,6 +124,14 @@ class TestIntegerAnswer(unittest.TestCase):
         with self.assertRaises(ValueError):
             self.descriptor_class.prop = 'hello'
 
+    def test_should_preserve_value_across_separate_instances(self):
+        desc1 = self.DescriptorTestClass()
+        desc1.prop = '123'
+        desc2 = self.DescriptorTestClass()
+        desc2.prop = '245'
+        self.assertEqual(123, desc1.prop)
+        self.assertEqual(245, desc2.prop)
+
 
 class TestDecimalAnswer(unittest.TestCase):
 
@@ -122,6 +149,14 @@ class TestDecimalAnswer(unittest.TestCase):
     def test_should_raise_error_if_invalid_decimal_given(self):
         with self.assertRaises(decimal.InvalidOperation):
             self.descriptor_class.prop = 'hello'
+
+    def test_should_preserve_value_across_separate_instances(self):
+        desc1 = self.DescriptorTestClass()
+        desc1.prop = '1.23'
+        desc2 = self.DescriptorTestClass()
+        desc2.prop = '4.56'
+        self.assertEqual(decimal.Decimal('1.23'), desc1.prop)
+        self.assertEqual(decimal.Decimal('4.56'), desc2.prop)
 
 
 class TestMultiChoiceAnswer(unittest.TestCase):
@@ -149,3 +184,11 @@ class TestMultiChoiceAnswer(unittest.TestCase):
     def test_should_correctly_handle_list_of_items(self):
         self.descriptor_class.prop = ['Face', 'Neck', 'Hands']
         self.assertEqual(['Face', 'Neck', 'Hands'], self.descriptor_class.prop)
+
+    def test_should_preserve_value_across_separate_instances(self):
+        desc1 = self.DescriptorTestClass()
+        desc1.prop = 'Hand|Foot'
+        desc2 = self.DescriptorTestClass()
+        desc2.prop = 'Foot|Mouth'
+        self.assertEqual(['Hand', 'Foot'], desc1.prop)
+        self.assertEqual(['Foot', 'Mouth'], desc2.prop)

@@ -33,8 +33,8 @@ class HIT(object):
             raise errors.Error('Invalid HIT given.')
 
         return cls(
-            hit_id=utils.safe_get_attr(raw_hit, 'HITId'),
-            batch_id=utils.safe_get_attr(raw_hit, 'RequesterAnnotation')
+            hit_id=utils.safe_getattr(raw_hit, 'HITId'),
+            batch_id=utils.safe_getattr(raw_hit, 'RequesterAnnotation')
         )
 
     def dispose(self):
