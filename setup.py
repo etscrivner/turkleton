@@ -25,7 +25,7 @@ test_requirements = [
 
 setup(
     name='turkleton',
-    version='1.1.0',
+    version='1.2.0',
     description="Simplified interfaces for assignments on Mechanical Turk.",
     long_description=readme + '\n\n' + history,
     author="Eric Scrivner",

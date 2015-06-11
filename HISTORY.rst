@@ -3,6 +3,12 @@
 History
 -------
 
+1.2.0 (2015-06-11)
+---------------------
+
+* More answer types
+* Bugfix where answers retained single value
+
 1.1.0 (2015-06-06)
 ---------------------
 
