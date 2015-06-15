@@ -85,6 +85,6 @@ def get_reviewable_by_batch_id(batch_id):
     """
     boto_connection = connection.get_connection()
     all_reviewable_hits = transform_raw_hits(
-        boto_connection.get_reviewable_hits(batch_id)
+        boto_connection.get_reviewable_hits()
     )
     return [each for each in all_reviewable_hits if each.batch_id == batch_id]
