@@ -3,6 +3,11 @@
 History
 -------
 
+1.2.1 (2015-06-15)
+---------------------
+
+* Bugfix, error when retrieving hits by batch id
+
 1.2.0 (2015-06-11)
 ---------------------
 
