@@ -33,32 +33,34 @@ Simply use pip to download the package from PyPI
 Features
 --------
 
-The existing Python APIs for Mechanical Turk are thin wrappers at best - we can
-do better.
+Turkleton aims to leverage the expressive powers of Python to make using
+Mechanical Turk easier. The highlights are:
 
-Turkleton aims to leverage the expressive powers of Python to improve the whole
-situation. While still under active development, the main features are:
-
-* Simple interface for defining tasks from pre-built layouts.
-* Simple interface for defining schema of assignment results.
+* Simple interface to define human intelligence tasks (HITs).
+* Define schemas for your results before downloading them.
 * Easily upload tasks in batches.
 * Easily download and validate assignments.
 
 Examples
 --------
 
-In turkleton there are several objects to be aware of: Tasks, HITs, and
-Assignments. A Task is a template from which HITs are created. A HIT
-corresponds to HIT in the Amazon Mechanical Turk API and represents an uploaded
-Task. Assignments are contained within HITs. An individual Assignment
-represents the set of answers submitted by a single worker. A HIT can have many
-Assignments.
+Some basic terminology is required to get up and running with Turkleton.
+
+A Task is a Human Intelligence Task (HIT). To get started with Turkleton you
+should first create a layout for your task in Mechanical Turk. You then provide
+your layout ID to turkleton as part of your task definition.
+
+Assignments contain the answers given by a turker to the questions in your
+task. An assignment defines the schema for the answers. Turkleton then uses
+your assignment to parse and validate the answers it receives.
 
 Setting Up Your Connection
 ^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Turkleton uses a per-process global connection. It should be initialized before
-you attempt to upload or download anything. You can initialize it like so:
+The first thing you need to do is setup your connection to Mechanical Turk.
+
+Turkleton uses a per-process global connection. You should always initialize it
+before you attempt to upload or download anything. You initialize it like so:
 
 .. code-block:: python
 
@@ -70,8 +72,11 @@ That's it!
 Creating A Task And Uploading It
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-To define a HIT you create a Task representing the template of the assignment
-you want a worker to complete. For example:
+Once you've created your layout on Mechanical Turk you can create HITs by
+defining a task in Turkleton.
+
+To define a HIT you create a Task representing the template of the
+assignment you want a worker to complete. For example:
 
 .. code-block:: python
 
@@ -87,8 +92,7 @@ you want a worker to complete. For example:
        __keywords__ = ['image', 'categorization']
        __time_per_assignment__ = datetime.timedelta(minutes=5)
 
-Here we've created a Task from an existing layout. Now that we've defined our
-task we can easily upload HITs by filling out the layout parameters:
+Now that you've defined your task you can easily upload HITs as follows:
 
 .. code-block:: python
 
@@ -96,11 +100,19 @@ task we can easily upload HITs by filling out the layout parameters:
    hit = task.upload(batch_id='1234')
 
 This will create a new assignment from the task template and upload it to
-Mechanical Turk. The optional batch_id parameter allows you to set the
-annotation for the task to an arbitrary string that you can use to retrieve
-tasks later in batches.
+Mechanical Turk. The variables image_url and first_guess in your template will
+contain the values given. The optional batch_id parameter allows you to set the
+requester annotation for the task to an arbitrary string. This is useful when
+you've uploaded more than one task in a batch. In the evaluation phase you can
+filter which assignments are downloaded by a given batch id.
 
-You can upload many tasks in a loop easily as follows:
+Uploading Multiple Tasks
+^^^^^^^^^^^^^^^^^^^^^^^^
+
+Usually you want to upload more than a one task. Turkleton provides two methods
+for easily doing this.
+
+The first method uses the create_and_upload method on your Task as follows:
 
 .. code-block:: python
 
@@ -109,7 +121,8 @@ You can upload many tasks in a loop easily as follows:
            image_url=image_url, first_guess='29', batch_id='1234'
        )
 
-If you'd like to leave off the batch id you can also use the context manager:
+It is often convenient to only set the batch id once. The task.batched_upload
+context manager is providing to make this approach easy as well:
 
 .. code-block:: python
 
@@ -117,12 +130,18 @@ If you'd like to leave off the batch id you can also use the context manager:
        for image_url in all_image_urls:
           MyTask.create_and_upload(image_url=image_url, first_guess='29')
 
+Every task you upload within the context will be automatically given the
+specified batch id.
+
 Downloading The Results
 ^^^^^^^^^^^^^^^^^^^^^^^
 
-To download results for a HIT you first need to define an assignment. The
-assignment defines what values are expected and their types. These are used to
-automatically parse answers to the various questions:
+When you want to download your results you'll need to define an assignment. The
+assignment defines the types of values you expect to get. These are used to
+automatically parse and type cast your answers so you can just deal with
+evaluating the results.
+
+You can define a simple task for categorizing an image as follows:
 
 .. code-block:: python
 
@@ -143,8 +162,12 @@ You can then download all of the HITs in a given batch as follows:
     from turkleton.assignment import hit
     reviewable_hits = hit.get_reviewable_by_batch_id('1234')
 
-Each HIT may then have multiple assignments associated with it. You can
-download the assignments, review them, and then dispose of the HIT as follows:
+Each HIT may have multiple assignments associated with it. This is the case if
+the __assignments_per_hit__ attribute in your task contains a number greater
+than 1.
+
+Now that you have the HITs you can download all the assignments, review them,
+and dispose of the HIT as follows:
 
 .. code-block:: python
 

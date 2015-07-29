@@ -53,7 +53,7 @@ def setup(access_key_id, secret_access_key, host=None):
     :type access_key_id: str or unicode
     :param secret_access_key: The access secret key
     :type secret_access_key: str or unicode
-    :param host: The host to connect to
+    :param host: (Optional, default is production MTurk) The host to connect to
     :type host: str or unicode
     :rtype: boto.mturk.connection.Connection
     """

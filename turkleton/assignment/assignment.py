@@ -6,7 +6,6 @@
 
 """
 from turkleton import connection
-from turkleton import errors
 from turkleton.assignment import answer
 
 

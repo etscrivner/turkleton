@@ -5,7 +5,6 @@ import mock
 
 from tests.assignment import factories
 from turkleton import connection
-from turkleton import errors
 from turkleton.assignment import answer
 from turkleton.assignment import assignment
 

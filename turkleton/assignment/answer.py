@@ -79,11 +79,9 @@ class BooleanAnswer(BaseAnswer):
         convert it into a boolean.
         """
         if isinstance(val, six.string_types):
-            super(BooleanAnswer, self).__set__(
-                obj, self.string_to_bool.get(val, self._EMPTY)
-            )
-        else:
-            super(BooleanAnswer, self).__set__(obj, val)
+            val = self.string_to_bool.get(val, self._EMPTY)
+
+        super(BooleanAnswer, self).__set__(obj, val)
 
 
 class IntegerAnswer(BaseAnswer):
